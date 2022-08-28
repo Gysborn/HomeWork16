@@ -19,8 +19,8 @@ class User(db.Model):
     role = db.Column(db.String(30))
     phone = db.Column(db.String(20))
 
-    order = relationship("Order")
-    offers = relationship("Offer")
+    # order = relationship("Order")
+    # offers = relationship("Offer")
 
     def __repr__(self):
         return {'first_name': self.first_name}
@@ -39,9 +39,9 @@ class Order(db.Model):
     customer_id = db.Column(db.Integer, db.ForeignKey(User.id))
     executer_id = db.Column(db.Integer, db.ForeignKey(User.id))
 
-    user = relationship("User")
-    offer = relationship("Offer")
-    customer = db.relationship('User', foreign_keys=[customer_id, executer_id])
+    # user = relationship("User")
+    # offer = relationship("Offer")
+    # customer = db.relationship('User', foreign_keys=[customer_id, executer_id])
     # executer = db.relationship('User', foreign_keys=[executer_id])
 
 
