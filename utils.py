@@ -51,4 +51,4 @@ def migrate_data(data):
     print(User.get(1))
 
 
-migrate_data(users_data)
+#migrate_data(users_data)
