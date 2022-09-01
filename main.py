@@ -19,66 +19,9 @@ class User(db.Model):
     role = db.Column(db.String(30))
     phone = db.Column(db.String(20))
     as_executor_in_offers = db.relationship('Offer', foreign_keys='Offer.executor_id')  # Положит список всех оферов
-                                                                                       # в которых он указан как исполнитель
+    # в которых он указан как исполнитель
     as_executor_in_orders = db.relationship('Order', foreign_keys='Order.executor_id')
     as_customer_in_orders = db.relationship('Order', foreign_keys='Order.customer_id')
-
-
-    def query_all_get():
-        result = []
-        try:
-            for v in User.query.all():
-                result.append(v.__repr__())
-        except Exception as e:
-            return f'Error {e}'
-        return jsonify(result), 200
-
-
-    def query_get_by_id(idx):
-        try:
-            user = User.query.get(idx)
-        except Exception as e:
-            return f'Error {e}'
-        return jsonify(user.__repr__())
-
-
-    def query_post_add():
-        try:
-            user_data = request.json
-            new_user = User(**user_data)
-            db.session.add(new_user)
-        except Exception as e:
-            return f'Ошибка {e}'
-
-        db.session.commit()
-        return f"Пользователь добавлен {new_user.__repr__()}"
-
-
-    def query_put_update(uid):
-        try:
-            new_data = request.json
-            user_data = User.query.get(uid)
-            user_data.first_name = new_data["first_name"]
-            user_data.last_name = new_data["last_name"]
-            user_data.age = new_data["age"]
-            user_data.email = new_data["email"]
-            user_data.role = new_data["role"]
-            user_data.phone = new_data["phone"]
-            db.session.add(user_data)
-        except Exception as e:
-            return f'Ошибка {e}'
-        db.session.commit()
-        return f"Данные обновлены {User.query.get(uid).__repr__()}"
-
-    def query_delete(idx):
-        try:
-            user = User.query.get(idx)
-            db.session.delete(user)
-        except Exception as e:
-            return f'Ошибка {e}'
-        db.session.commit()
-        return 'deleted', 200
-
 
     def __repr__(self):
         return {
@@ -106,62 +49,8 @@ class Order(db.Model):
     executor_id = db.Column(db.Integer, db.ForeignKey(User.id))
 
     as_order_in_offers = db.relationship('Offer')  # Ищет в Офере внешний ключ ссылающийся
-                                                   # на него самого и кладет в переменную
 
-    def query_all_get():
-        result = []
-        try:
-            for v in Order.query.all():
-                result.append(v.__repr__())
-        except Exception as e:
-            return f'Error {e}'
-        return jsonify(result), 200
-
-
-    def query_get_by_id(idx):
-        try:
-            user = Order.query.get(idx)
-        except Exception as e:
-            return f'Error {e}'
-        return jsonify(user.__repr__())
-
-
-    def query_post_add():
-        try:
-            user_data = request.json
-            new_user = Order(**user_data)
-            db.session.add(new_user)
-        except Exception as e:
-            return f'Ошибка {e}'
-
-        db.session.commit()
-        return f"Пользователь добавлен {new_user.__repr__()}"
-
-
-    def query_put_update(uid):
-        try:
-            new_data = request.json
-            user_data = Order.query.get(uid)
-            user_data.name = new_data["name"]
-            user_data.description = new_data["description"]
-            user_data.start_date = new_data["start_date"]
-            user_data.end_date = new_data["end_date"]
-            user_data.address = new_data["address"]
-            user_data.price = new_data["price"]
-            db.session.add(user_data)
-        except Exception as e:
-            return f'Ошибка {e}'
-        db.session.commit()
-        return f"Данные обновлены {User.query.get(uid).__repr__()}"
-
-    def query_delete(idx):
-        try:
-            user = Order.query.get(idx)
-            db.session.delete(user)
-        except Exception as e:
-            return f'Ошибка {e}'
-        db.session.commit()
-        return 'deleted', 200
+    # на него самого и кладет в переменную
 
     def __repr__(self):
         return {
@@ -173,7 +62,6 @@ class Order(db.Model):
             'address': self.address,
             'price': self.price,
         }
-        
 
 
 class Offer(db.Model):
@@ -187,66 +75,67 @@ class Offer(db.Model):
     # order_id(as_order_in_offers)
     executor = db.relationship('User', back_populates="as_executor_in_offers", foreign_keys=[executor_id])  #
 
-    def query_all_get():
-        result = []
-        try:
-            for v in Offer.query.all():
-                result.append(v.__repr__())
-        except Exception as e:
-            return f'Error {e}'
-        return jsonify(result), 200
-
-
-    def query_get_by_id(idx):
-        try:
-            user = Offer.query.get(idx)
-        except Exception as e:
-            return f'Error {e}'
-        return jsonify(user.__repr__())
-
-
-    def query_post_add():
-        try:
-            user_data = request.json
-            new_user = Offer(**user_data)
-            db.session.add(new_user)
-        except Exception as e:
-            return f'Ошибка {e}'
-
-        db.session.commit()
-        return f"Пользователь добавлен {new_user.__repr__()}"
-
-
-    def query_put_update(uid):
-        try:
-            new_data = request.json
-            user_data = Offer.query.get(uid)
-
-            user_data.order_id = new_data["order_id"]
-            user_data.executor_id = new_data["executor_id"]
-
-            db.session.add(user_data)
-        except Exception as e:
-            return f'Ошибка {e}'
-        db.session.commit()
-        return f"Данные обновлены {User.query.get(uid).__repr__()}"
-
-    def query_delete(idx):
-        try:
-            user = Offer.query.get(idx)
-            db.session.delete(user)
-        except Exception as e:
-            return f'Ошибка {e}'
-        db.session.commit()
-        return 'deleted', 200
-
     def __repr__(self):
         return {
             'id:': self.id,
             'order_id': self.order_id,
             'executor_id': self.executor_id
         }
-    
+
+
+def query_all_get(model):
+    result = []
+    try:
+        for v in model.query.all():
+            result.append(v.__repr__())
+    except Exception as e:
+        return f'Error {e}'
+    return jsonify(result), 200
+
+
+def query_get_by_id(model, idx):
+    try:
+        user = model.query.get(idx)
+    except Exception as e:
+        return f'Error {e}'
+    return jsonify(user.__repr__())
+
+
+def query_put_update(model, idx):
+    try:
+        new_data = request.json
+        user_data = model.query.get(idx)
+        data_keys = new_data.keys()
+        for k in data_keys:
+            setattr(user_data, k, new_data[k])
+
+        db.session.add(user_data)
+    except Exception as e:
+        return f'Ошибка {e}'
+    db.session.commit()
+    return f"Данные обновлены {model.query.get(idx).__repr__()}"
+
+
+def query_post_add(model):
+    try:
+        user_data = request.json
+        new_user = model(**user_data)
+        db.session.add(new_user)
+    except Exception as e:
+        return f'Ошибка {e}'
+
+    db.session.commit()
+    return f"Пользователь добавлен {new_user.__repr__()}"
+
+
+def query_delete(model, idx):
+    try:
+        user = model.query.get(idx)
+        db.session.delete(user)
+    except Exception as e:
+        return f'Ошибка {e}'
+    db.session.commit()
+    return 'deleted', 200
 
 
 db.drop_all()
@@ -259,10 +148,9 @@ def migrate_data(data, model):
             new_inst = model(**d)
             db.session.add(new_inst)
 
-        db.session.commit()
-        # print(User.query.get(2).__repr__())
     except Exception as e:
         print(f'Ощибочка вышла {e}')
+    db.session.commit()
 
 
 migrate_data(users_data, User)
@@ -270,33 +158,29 @@ migrate_data(orders_data, Order)
 migrate_data(offers_data, Offer)
 
 
-
 @app.route('/')
 def hello():
     return 'Let`s the party begin! Enter a query'
 
 
-
-
 @app.route('/users', methods=['GET', 'POST'])
 def get_post_users():
     if request.method == 'GET':
-        return User.query_all_get()
+        return query_all_get(User)
     if request.method == 'POST':
-        return User.query_post_add()
+        return query_post_add(User)
     else:
         return 'Неверный метод запроса', 500
-
 
 
 @app.route('/users/<int:idx>', methods=['GET', 'PUT', 'DELETE'])
 def get_put_delete_user(idx):
     if request.method == 'GET':
-        return User.query_get_by_id(idx)
+        return query_get_by_id(User, idx)
     if request.method == 'PUT':
-        return User.query_put_update(idx)
+        return query_put_update(User, idx)
     if request.method == 'DELETE':
-        return User.query_delete(idx)
+        return query_delete(User, idx)
     else:
         return 'Неверный метод запроса', 500
 
@@ -304,9 +188,9 @@ def get_put_delete_user(idx):
 @app.route('/orders', methods=['GET', 'POST'])
 def get_post_orders():
     if request.method == 'GET':
-        return Order.query_all_get()
+        return query_all_get(Order)
     if request.method == 'POST':
-        return Order.query_post_add()
+        return query_post_add(Order)
     else:
         return 'Неверный метод запроса', 500
 
@@ -314,11 +198,11 @@ def get_post_orders():
 @app.route('/orders/<int:idx>', methods=['GET', 'PUT', 'DELETE'])
 def get_put_delete_order(idx):
     if request.method == 'GET':
-        return Order.query_get_by_id(idx)
+        return query_get_by_id(Order, idx)
     if request.method == 'PUT':
-        return Order.query_put_update(idx)
+        return query_put_update(Order, idx)
     if request.method == 'DELETE':
-        return Order.query_delete(idx)
+        return query_delete(Order, idx)
     else:
         return 'Неверный метод запроса', 500
 
@@ -326,9 +210,9 @@ def get_put_delete_order(idx):
 @app.route('/offers', methods=['GET', 'POST'])
 def get_post_offers():
     if request.method == 'GET':
-        return Offer.query_all_get()
+        return query_all_get(Offer)
     if request.method == 'POST':
-        return Offer.query_post_add()
+        return query_post_add(Offer)
     else:
         return 'Неверный метод запроса', 500
 
@@ -336,15 +220,13 @@ def get_post_offers():
 @app.route('/offers/<int:idx>', methods=['GET', 'PUT', 'DELETE'])
 def get_put_delete_offer(idx):
     if request.method == 'GET':
-        return Offer.query_get_by_id(idx)
+        return query_get_by_id(Offer, idx)
     if request.method == 'PUT':
-        return Offer.query_put_update(idx)
+        return query_put_update(Offer, idx)
     if request.method == 'DELETE':
-        return Offer.query_delete(idx)
+        return query_delete(Offer, idx)
     else:
         return 'Неверный метод запроса', 500
-
-
 
 
 if __name__ == '__main__':
