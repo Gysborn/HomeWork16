@@ -23,7 +23,7 @@ class User(db.Model):
     as_executor_in_orders = db.relationship('Order', foreign_keys='Order.executor_id')
     as_customer_in_orders = db.relationship('Order', foreign_keys='Order.customer_id')
 
-    def __repr__(self):
+    def to_dict(self):
         return {
             'id:': self.id,
             'first_name': self.first_name,
@@ -52,7 +52,7 @@ class Order(db.Model):
 
     # на него самого и кладет в переменную
 
-    def __repr__(self):
+    def to_dict(self):
         return {
             'id:': self.id,
             'name': self.name,
@@ -75,7 +75,7 @@ class Offer(db.Model):
     # order_id(as_order_in_offers)
     executor = db.relationship('User', back_populates="as_executor_in_offers", foreign_keys=[executor_id])  #
 
-    def __repr__(self):
+    def to_dict(self):
         return {
             'id:': self.id,
             'order_id': self.order_id,
@@ -87,7 +87,7 @@ def query_all_get(model):
     result = []
     try:
         for v in model.query.all():
-            result.append(v.__repr__())
+            result.append(v.to_dict())
     except Exception as e:
         return f'Error {e}'
     return jsonify(result), 200
@@ -98,22 +98,20 @@ def query_get_by_id(model, idx):
         user = model.query.get(idx)
     except Exception as e:
         return f'Error {e}'
-    return jsonify(user.__repr__())
+    return jsonify(user.to_dict())
 
 
 def query_put_update(model, idx):
     try:
         new_data = request.json
         user_data = model.query.get(idx)
-        data_keys = new_data.keys()
-        for k in data_keys:
-            setattr(user_data, k, new_data[k])
+        [setattr(user_data, k, v) for k, v in new_data.items()]
 
         db.session.add(user_data)
     except Exception as e:
         return f'Ошибка {e}'
     db.session.commit()
-    return f"Данные обновлены {model.query.get(idx).__repr__()}"
+    return f"Данные обновлены {model.query.get(idx).to_dict()}"
 
 
 def query_post_add(model):
@@ -125,7 +123,7 @@ def query_post_add(model):
         return f'Ошибка {e}'
 
     db.session.commit()
-    return f"Пользователь добавлен {new_user.__repr__()}"
+    return f"Пользователь добавлен {new_user.to_dict()}"
 
 
 def query_delete(model, idx):
